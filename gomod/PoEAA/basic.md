@@ -1,0 +1,15 @@
+# Базовые паттерны
+## [<<< ---](../PoEAA.md)
+
+- [Шлюз (Gateway)](basic/gateway.md)
+- [Mapper](basic/mapper.md)
+- [Layer Supertype](basic/layer-supertype.md)
+- [Отделенный интерфейс (Separated Interface)](basic/separated-interface.md)
+- [Registry (Реестр)](basic/registry.md)
+- [Объект-значение (Value Object)](basic/value-object.md)
+- [Частный случай (Special Case)](basic/special-case.md)
+- [Дополнительный модуль (Plugin)](basic/plugin.md)
+- [Фиктивная служба (Service Stub)](basic/service-stub.md)
+- [Record Set](basic/record-set.md)
+- [Заместитель (Proxy)](basic/proxy.md)
+- [Functional Options](basic/functional-options.md)
