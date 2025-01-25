@@ -32,12 +32,14 @@
 | Cube Sort  |🔵 O(n)|🔴 O(n log n)|🔴 O(n log n)|🔵 O(n)|
 ---
 <details><summary>Quick sort</summary>
+
 ![Quick](./algo/assets/Quicksort.gif)
 
 https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/quicksort.go#L3-L38
 </details>
 
 <details><summary>Merge sort</summary>
+
 ![Merge](./algo/assets/mergesort.gif)
 
 https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/mergesort.go#L3-L49
@@ -48,18 +50,21 @@ https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce8
 </details>
 
 <details><summary>Heap sort</summary>
+
 ![Heap](./algo/assets/heapsort.gif)
 
 https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/heapsort.go#L3-L48
 </details>
 
 <details><summary>Bubble sort</summary>
+
 ![Bubble](./algo/assets/bubblesort.gif)
 
 https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/bubblesort.go#L3-L33
 </details>
 
 <details><summary>Insertion Sort</summary>
+
 ![Insert](./algo/assets/insertionsort.gif) 
 
 https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/insertionsort.go#L3-L28
