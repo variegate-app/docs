@@ -3,3 +3,4 @@
 - [чистая архитектура](./gomod/clean_arch.md)
 - [uml](./gomod/uml.md)
 - [golang](./gomod/golang.md)
+- [алгоритмы](./gomod/algo.md)
