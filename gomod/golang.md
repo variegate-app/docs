@@ -17,11 +17,9 @@
 
 - [Golang advanced tutorial](https://golangbyexample.com/golang-comprehensive-tutorial/)
 - [Всё, что вы хотели знать про GOPATH и GOROOT](https://habr.com/ru/post/249545/)
-- [GOLAND документация](https://www.jetbrains.com/help/go/quick-start-guide-goland.html)
 - [50 оттенков Go](https://habr.com/ru/company/mailru/blog/314804/)
 - [50 Shades of Go](http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/)
 - [Go: Memory Management and Allocation](https://medium.com/a-journey-with-go/go-memory-management-and-allocation-a7396d430f44)
-- [Design patterns in Go](https://github.com/CoolClever-Lab/methodologic/tree/main/books/design-patterns-ru/Go)
 
 ## **Scheduling In Go**
 
