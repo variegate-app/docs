@@ -1,20 +1,6 @@
 # Основные типы алгоритмов:
 ## [<<< ---](../README.md)
 
-<style>
-blue {
-  color: lightblue;
-}
-
-red {
-  color: red;
-}
-
-green {
-  color: lightgreen;
-}
-</style>
-
 - **Линейные** 
     Это самый простой тип алгоритма: действия идут друг за другом, каждое начинается после того, как закончится предыдущее. Они не переставляются местами, не повторяются, выполняются при любых условиях.
 - **Ветвящиеся**
@@ -31,19 +17,19 @@ green {
 | Алгоритм | Time Best| Time Middle | Time Worst | Space Worst|
 |---|---|---|---|---|
 | Quick sort |<red>O(n log n)</red>|<red>O(n log n)</red>|<red>O(n)</red>|<green>O(n*log(n))</green>|
-| Merge sort |<red>O(n log n)</red>|<red>O(n log n)</red>|<red>O(n log n)</red>| <blue>O(n)</blue>|
-| Tim sort |<blue>O(n)<blue>|<red>O(n log n)</red>|<red>O(n log n)</red>|<blue>O(1)</blue>|
+| Merge sort |<red>O(n log n)</red>|<red>O(n log n)</red>|<red>O(n log n)</red>| <blue>O(n) `#0969DA`|
+| Tim sort |<blue>O(n)<blue>|<red>O(n log n)</red>|<red>O(n log n)</red>|<blue>O(1) `#0969DA`|
 | Heap sort |<red>O(n log n)</red>|<red>O(n log n)</red>|<red>O(n log n)</red>|<green>O(1)</green>|
-| Bubble sort |<blue>O(n)</blue>|<red>O(n<sup>2</sup>)</red>|<red>O(n<sup>2</sup>)</red>|<green>O(1)</green>|
-| Insertion Sort |<blue>O(n)</blue>|<red>O(n<sup>2</sup>)</red>|<red>O(n<sup>2</sup>)</red>|<green>O(1)</green>|
+| Bubble sort |<blue>O(n) `#0969DA`|<red>O(n<sup>2</sup>)</red>|<red>O(n<sup>2</sup>)</red>|<green>O(1)</green>|
+| Insertion Sort |<blue>O(n) `#0969DA`|<red>O(n<sup>2</sup>)</red>|<red>O(n<sup>2</sup>)</red>|<green>O(1)</green>|
 | Selection Sort |<green>O(n<sup>2</sup>)</green>|<red>O(n<sup>2</sup>)</red>|<red>O(n<sup>2</sup>)</red>|<green>O(1)</green>|
-| Tree Sort |<red>O(n log n)</red>|<red>O(n log(n) )</red>|<red>O(n<sup>2</sup>) * T</red>|<blue>O(n)</blue>|
+| Tree Sort |<red>O(n log n)</red>|<red>O(n log(n) )</red>|<red>O(n<sup>2</sup>) * T</red>|<blue>O(n) `#0969DA`|
 | Shell Sort |<red>O(n log n)</red>|<red>O(n (log n)<sup>2</sup>)</red>|<red>O(n (log n)<sup>2</sup>)</red>|<green>O(1)</green>|
-| Bucket Sort |<green>O(n + K)</green>|<green>O(n + K)</green>|<red>O(n<sup>2</sup>)</red>|<blue>O(n)</blue>|
-| Radix Sort |<green>O( nK )</green>|<green>O( nK )</green>|<green>O( nK )</green>|<blue>O( n + K )</blue>|
-| Counting Sort  |<green>O(n + K)</green>|<green>O(n + K)</green>|<green>O(n + K)</green>| <blue>O(K)</blue>|
-| Cube Sort  |<blue>O(n)</blue>|<red>O(n log n)</red>|<red>O(n log n)</red>|<blue>O(n)</blue>|
-
+| Bucket Sort |<green>O(n + K)</green>|<green>O(n + K)</green>|<red>O(n<sup>2</sup>)</red>|<blue>O(n) `#0969DA`|
+| Radix Sort |<green>O( nK )</green>|<green>O( nK )</green>|<green>O( nK )</green>|<blue>O( n + K ) `#0969DA`|
+| Counting Sort  |<green>O(n + K)</green>|<green>O(n + K)</green>|<green>O(n + K)</green>| <blue>O(K) `#0969DA`|
+| Cube Sort  |<blue>O(n) `#0969DA`|<red>O(n log n)</red>|<red>O(n log n)</red>|<blue>O(n) `#0969DA`|
+---
 <details><summary>Quick sort</summary>
 https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/quicksort.go#L3-L38
 </details>
