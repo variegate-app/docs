@@ -17,11 +17,19 @@
 
 ### Quick sort
 
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/quicksort.go#L3-L38
+
 ### Merge sort
+
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/mergesort.go#L3-L49
 
 ### Tim sort
 
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/timsort.go#L3-L72
+
 ### Heap sort
+
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/heapsort.go#L3-L48
 
 ### Bubble sort
 
@@ -29,16 +37,32 @@ https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce8
 
 ### Insertion Sort
 
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/insertionsort.go#L3-L28
+
 ### Selection Sort
+
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/selectionsort.go#L3-L29
 
 ### Tree Sort
 
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/treesort.go#L3-L54
+
 ### Shell Sort
+
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/shellsort.go#L3-L44
 
 ### Bucket Sort
 
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/bucketsort.go#L3-L80
+
 ### Radix Sort
+
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/radixsort.go#L3-L74
 
 ### Counting Sort
 
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/countingsort.go#L3-L59
+
 ### Cube Sort
+
+https://github.com/variegate-app/docs/blob/51261f42242e5a83ed3252ac190f2d53cbce847f/gomod/algo/sort/cubesort.go#L3-L46
