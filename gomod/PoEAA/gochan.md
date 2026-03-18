@@ -19,24 +19,24 @@
 - [Drop](./gochan/drop.md)
 - [Cancellation](./gochan/сancellation.md)
 ---
-- Take First N
-- Map, Filter
-- Filter
-- Pipeline
-- Worker Pool
-- Queuing
-- Context
+ - [Take First N](./gochan/take-first-n.md)
+ - [Map & Filter](./gochan/map-filter.md)
+ - [Filter](./gochan/filter.md)
+ - [Pipeline](./gochan/pipeline.md)
+ - [Worker Pool](./gochan/worker-pool.md)
+ - [Queuing](./gochan/queuing.md)
+ - [Context](./gochan/context.md)
 ---
-- Exponential backoff
-- fault-tolerance
-- Deadline
-- Fail-Fast
-- Handshaking
-- Steady-State
+ - [Exponential backoff](./gochan/exponential-backoff.md)
+ - [Fault-tolerance](./gochan/fault-tolerance.md)
+ - [Deadline](./gochan/deadline.md)
+ - [Fail-Fast](./gochan/fail-fast.md)
+ - [Handshaking](./gochan/handshaking.md)
+ - [Steady-State](./gochan/steady-state.md)
 ---
-- Stopping short
-- Explicit cancellation
-- Digesting a tree
-- Parallel digestion
-- Conclusion
-- Round tripper
+ - [Stopping short](./gochan/stopping-short.md)
+ - [Explicit cancellation](./gochan/explicit-cancellation.md)
+ - [Digesting a tree](./gochan/digesting-a-tree.md)
+ - [Parallel digestion](./gochan/parallel-digestion.md)
+ - [Conclusion](./gochan/conclusion.md)
+ - [Round tripper](./gochan/round-tripper.md)
