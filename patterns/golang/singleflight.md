@@ -1,0 +1,48 @@
+# singleflight
+
+## [<<< ---](../index.md)
+
+`singleflight` (coalescing) помогает “схлопывать” одинаковые конкурентные запросы в один реальный вычислительный/сетевой вызов.
+
+Если несколько горутин одновременно вызывают получение ресурса по одному и тому же ключу (`key`), то:
+
+- только первая горутина выполняет функцию;
+- остальные ждут результат и получают тот же `v/err`.
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+
+	"golang.org/x/sync/singleflight"
+)
+
+func main() {
+	var sf singleflight.Group
+
+	load := func(key string) (string, error) {
+		// Имитация медленной операции (БД/API).
+		time.Sleep(200 * time.Millisecond)
+		return "value for " + key, nil
+	}
+
+	var wg sync.WaitGroup
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			v, err, shared := sf.Do("user:42", func() (any, error) {
+				return load("user:42")
+			})
+			fmt.Printf("goroutine=%d shared=%v v=%v err=%v\n", i, shared, v, err)
+		}(i)
+	}
+	wg.Wait()
+}
+```
+
+Используй `singleflight`, когда дубли запросов неизбежны (например, всплеск входящего трафика) и это важнее, чем выполнять одни и те же вычисления многократно.
+

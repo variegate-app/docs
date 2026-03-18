@@ -40,10 +40,7 @@
 - [Wait For Task](./golang/wait-for-task.md)
 - [Pooling](./golang/pooling.md)
 - [Drop](./golang/drop.md)
-- [Cancellation](./golang/сancellation.md)
-
----
-
+- [Cancellation](./golang/cancellation.md)
 - [Take First N](./golang/take-first-n.md)
 - [Map & Filter](./golang/map-filter.md)
 - [Filter](./golang/filter.md)
@@ -51,24 +48,26 @@
 - [Worker Pool](./golang/worker-pool.md)
 - [Queuing](./golang/queuing.md)
 - [Context](./golang/context.md)
-
----
-
 - [Exponential backoff](./golang/exponential-backoff.md)
 - [Fault-tolerance](./golang/fault-tolerance.md)
 - [Deadline](./golang/deadline.md)
 - [Fail-Fast](./golang/fail-fast.md)
 - [Handshaking](./golang/handshaking.md)
 - [Steady-State](./golang/steady-state.md)
-
----
-
 - [Stopping short](./golang/stopping-short.md)
 - [Explicit cancellation](./golang/explicit-cancellation.md)
 - [Digesting a tree](./golang/digesting-a-tree.md)
 - [Parallel digestion](./golang/parallel-digestion.md)
 - [Conclusion](./golang/conclusion.md)
 - [Round tripper](./golang/round-tripper.md)
+- [errgroup (параллельные задачи + отмена при первой ошибке)](./golang/errgroup.md)
+- [singleflight (coalescing дублирующихся запросов)](./golang/singleflight.md)
+- [debounce (схлопывание событий по таймеру)](./golang/debounce.md)
+- [throttle / rate limiter (ограничение частоты)](./golang/rate-limiter.md)
+- [token bucket / leaky bucket (варианты rate limiting)](./golang/token-bucket-leaky-bucket.md)
+- [jitter для retry/backoff (рандомизация задержек, чтобы избегать “thundering herd”)](./golang/jitter.md)
+- [sync.Pool / object pooling (переиспользование объектов)](./golang/sync-pool.md)
+- [graceful shutdown / drain каналов (упорядоченное завершение конвейеров без утечек)](./golang/graceful-shutdown.md)
 
 ## Микросервисы
 
