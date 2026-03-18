@@ -2,35 +2,35 @@
 
 ## [<<< ---](../gochan.md)
 
-The main idea behind the **Cancellation Pattern** is to have a limited amount of time to perform work. If limit is reached, the work is ignored.
+Основная идея паттерна **Cancellation** — ограничить время, отведённое на выполнение работы. Если лимит превышен, результат работы нас больше не интересует.
 
-We have:
+У нас есть:
 
-- a context with specified timeout
-- a buffered channel that provides signaling semantic
-- a worker goroutine that does the work
-- a manager goroutine that waits on (which comes first):
-    - worker goroutine signal (that the work is completed)
-    - context timeout signal
+- контекст с заданным таймаутом;
+- буферизованный канал, который используется как канал сигналов;
+- рабочая горутина, которая выполняет работу;
+- управляющая горутина, которая ждёт либо:
+    - сигнал от рабочей горутины о завершении работы,
+    - либо сигнал об истечении таймаута в контексте.
 
-### Example
+### Пример
 
-In **Cancellation Pattern** we have a limited amount of time to perform some work.
+В **Cancellation** у нас есть ограниченное время на выполнение некоторой работы.
 
-Imagine we are in the ice cream making business and we have:
+Представим, что мы делаем мороженое:
 
-- a `manager` (`main` goroutine) that get and holds a scoop of the ice cream in one hand
-    - he holds out his other hand (`communication channel`) and waits for an `employee` (`worker` goroutine) to pass him the ice cream cone so he can sell the ice cream
-- an `employee` (`worker` goroutine) that needs some time to get the ice cream cone so he can pass it to the mangers' `hand`
-    - if `employee` takes too much time to get the ice cream cone, the ice cream that `manager` holds will melt, so he won't need the ice cream cone anymore and the manager won't hold his hand anymore
-- an `employee` is now stuck with the ice cream cone in his hand and can't perform any other work (`goroutine leak`)
-    - to fix this `employee` and the `manager` decided to use new `communication` channel (e.g. desk `buffered channel`) so that `employee` can complete his work, regardless of the managers' hand
+- есть `manager` (`main`-горутина), который держит в одной руке шарик мороженого;
+    - он протягивает вторую руку (это `communication channel`) и ждёт, пока `employee` (`worker`-горутина) передаст ему рожок, чтобы можно было продать мороженое;
+- есть `employee` (`worker`-горутина), которому нужно время, чтобы принести рожок и передать его в руку менеджеру;
+    - если `employee` делает это слишком медленно, шарик в руке `manager` растает, и рожок уже не нужен — менеджер убирает руку;
+- в итоге `employee` остаётся с ненужным рожком и не может заняться другой работой (утечка горутины);
+    - чтобы исправить это, `employee` и `manager` договариваются использовать новый канал связи (например, стол — `buffered channel`), чтобы `employee` мог завершить свою работу независимо от того, ждёт ли её ещё менеджер.
 
 ### Use Case
 
-Good use case for this pattern is any request to a remote service, e.g. database request, API request or whatever request that can block. Since we don't want our request to block forever, we use timeout to cancel it.
+Хороший пример использования этого паттерна — любой запрос к внешнему сервису: база данных, API или любая потенциально блокирующая операция. Мы не хотим ждать её вечно, поэтому ограничиваем время с помощью таймаута и при его срабатывании отменяем работу.
 
-Feel free to try the example on [Go Playground](https://play.golang.com/p/RCy0Iajt0tl)
+Пример можно запустить на [Go Playground](https://play.golang.com/p/RCy0Iajt0tl).
 
 ```go
 package main
@@ -43,74 +43,72 @@ import (
 )
 
 func main() {
-    // a duration that sets the max time to perform the operation
+    // длительность, задающая максимальное время на выполнение операции
+    // например, 150 мс на получение рожка с мороженым
+    duration := 150 * time.Millisecond
 
-    // e.g 150 ms to get the ice cream cone
-    duration := 1 * time.Millisecond
-
-    // context.Background() returns a non-nil, empty Context.
-    // It is never canceled, has no values, and has no deadline.
-    // It is typically used by the main function, initialization, and tests,
-    // and as the top-level Context for incoming requests.
+    // context.Background() возвращает не-nil "пустой" контекст.
+    // Он никогда не отменяется, не содержит значений и не имеет дедлайна.
+    // Обычно его используют в main-функции, инициализации, тестах
+    // и как верхнеуровневый контекст для входящих запросов.
     emptyCtx := context.Background()
 
-    // Create new context from emptyCtx + add timeout of 150 ms
-    // ctx is new context with timeout
-    // cancel is a function that releases resources associated with context
+    // Создаём новый контекст на базе emptyCtx и добавляем таймаут 150 мс.
+    // ctx — новый контекст с таймаутом,
+    // cancel — функция, освобождающая ресурсы, связанные с контекстом.
 
-    // e.g. ticker that the manager uses to check if he gets the ice cream cone fast enough
+    // Аналог "таймера", который менеджер использует, чтобы понять,
+    // успеет ли он получить рожок достаточно быстро.
     ctx, cancel := context.WithTimeout(emptyCtx, duration)
 
-    // Canceling this context releases resources associated with it,
-    // so code should call cancel as soon as the operations running in
-    // this Context complete
+    // Отмена контекста освобождает связанные с ним ресурсы,
+    // поэтому cancel нужно вызывать, как только операции,
+    // использующие этот контекст, завершились.
 
-    // e.g. command manager uses to cancel the context (unit of work - getting ice cream cone)
+    // Команда, которой менеджер "отменяет" задачу (получение рожка).
     defer cancel()
 
-    // IMPORTANT:
-    // Make buffered channel of size 1, and type string which provides signaling semantics.
-    // Buffered channel ensures that the worker goroutine can perform the send operation
-    // and complete even if there is no-one on the receive side.
-    // e.g.
-    // - if worker goroutine does NOT finish in 150ms
-    // -- main goroutine will continue
-    // -- this will cause worker goroutine leak
-    //    since there is no-one goroutine to receive the sent signal (so it blocks and waits)
+    // ВАЖНО:
+    // Создаём буферизованный канал размера 1 и типа string, который даёт
+    // семантику сигналов.
+    // Буфер гарантирует, что worker сможет отправить сигнал и завершиться,
+    // даже если к этому моменту уже некому его принять.
+    // Например:
+    // - если worker не успеет за 150 мс,
+    // -- main продолжит выполнение,
+    // -- goroutine worker может утечь, если ей некуда будет отправить сигнал.
 
-    // e.g. used to prevent employee from being blocked if he doesn't complete the work in 150ms
+    // Этот канал защищает "сотрудника" от блокировки, если он не успеет
+    // закончить работу за отведённое время.
     ch := make(chan string, 1)
 
-    // create worker goroutine
+    // создаём рабочую горутину
     go func() {
-        // Simulate the idea of unknown latency (do not use in production).
-        // Don't forget that context timeout is 150 ms, but this can take up to 200 ms.
+        // Имитация непредсказуемой задержки (в проде так делать не стоит).
+        // Обрати внимание: таймаут контекста — 150 мс, а тут может быть до 200 мс.
 
-        // e.g. employee reaches out for the ice cream cone from the box
+        // Сотрудник тянется за рожком в коробке.
         time.Sleep(time.Duration(rand.Intn(200)) * time.Millisecond)
 
-        // send signal when work is done
-        // e.g. employee passes ice creeam cone to the managers' hand
+        // Отправляем сигнал по завершении работы —
+        // сотрудник передаёт рожок в руку менеджера.
         ch <- "paper"
     }()
 
-    // select-case allow us to perform multiple channel operations
-    // at the same time, on the same goroutine
-
-    // e.g. manager waits for ice cream cone, or for 150 ms timer to time out
+    // select-case позволяет нам обрабатывать несколько операций с каналами
+    // одновременно в одной горутине.
+    // Менеджер либо ждёт рожок, либо срабатывания 150‑мс таймера.
     select {
 
-    // best case scenario:
-    // receive a result from worker goroutine in under the 150 ms
-
-    // e.g. employee finds and passes the ice cream cone to the manager
+    // Лучший сценарий:
+    // получили результат от worker раньше, чем истёк таймаут.
+    // Сотрудник успел найти рожок и передать его менеджеру.
     case d := <-ch:
         fmt.Println("work complete", d)
 
-    // ctx.Done() call starts the 150ms duration clock ticking.
-    // If 150 ms passes before the worker goroutine finishes, this println will be executed
-
-    // e.g. manager doesn't wait for employee to get the ice cream cone anymore
+    // Вызов ctx.Done() запускает отсчёт таймаута.
+    // Если 150 мс проходят раньше, чем воркер закончит, выполнится эта ветка.
+    // Менеджер перестаёт ждать, что сотрудник принесёт рожок.
     case <-ctx.Done():
         fmt.Println("work cancelled")
     }
@@ -118,7 +116,7 @@ func main() {
 
 ```
 
-### Result (1st execution)
+### Результат (1‑й запуск)
 
 ```
 go run main.go
@@ -127,7 +125,7 @@ work complete paper
 
 ```
 
-### Result (2st execution)
+### Результат (2‑й запуск)
 
 ```
 go run main.go

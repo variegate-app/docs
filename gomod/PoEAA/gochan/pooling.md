@@ -2,24 +2,24 @@
 
 ## [<<< ---](../gochan.md)
 
-The main idea behind **Pooling** pattern is to have:
+Основная идея паттерна **Pooling**:
 
-- a channel that provides a signaling semantics
-    - unbuffered channel is used to have a guarantee a goroutine has received a signal
-- multiple goroutines that pool that channel for work
-- a goroutine that sends work via channel
+- есть канал, предоставляющий семантику сигналов;
+    - для гарантии приёма сигнала используется небуферизованный канал;
+- есть несколько горутин, которые «слушают» этот канал в ожидании работы;
+- есть горутина, которая отправляет работу через этот канал.
 
-### Example
+### Пример
 
-In this example you are a `manager`, and you hire a bunch of new `employees`.
+В этом примере вы — `manager`, нанимающий пачку новых `employees`.
 
-`Employees` don't know immediately what do to, and they wait for `manager` to give them some work. The are looking at the channel `ch` to see if there is some work to do.
+`Employees` поначалу не знают, что делать, и ждут, пока `manager` даст им работу. Они смотрят в канал `ch`, чтобы увидеть, появилась ли работа.
 
-Once `manager` finds some work for the `employees`, it notifies them by sending a signal (`paper`) via communication channel `ch`.
+Как только `manager` находит задание для `employees`, он уведомляет их, отправляя сигнал (`paper`) через канал `ch`.
 
-First available `employee` that sees a signal from the channel `ch`, takes and completes the work.
+Первый свободный `employee`, который увидит сигнал в `ch`, забирает и выполняет работу.
 
-After that `employee` completes the work, he is once again available to do more work, and he starts waiting for a new signal on channel `ch`.
+После завершения работы `employee` снова становится доступен для новых задач и вновь ждёт сигнал в канале `ch`.
 
 ```go
 package main
@@ -30,45 +30,45 @@ import (
 )
 
 func main() {
-    // make channel of type string which provides signaling semantics
-    // unbuffered channel provides a guarantee that the
-    // signal being sent is received
+    // создаём канал типа string, который даёт семантику сигналов;
+    // небуферизованный канал гарантирует, что отправленный сигнал будет принят.
     ch := make(chan string)
 
-    // number of goroutines to create, numCPU() is a good starting point
-    //g := runtime.NumCPU()
+    // количество горутин; неплохая отправная точка — runtime.NumCPU()
+    // g := runtime.NumCPU()
     g := 3
 
     for e := 0; e < g; e++ {
-        // a new goroutine is created for each employee
+        // для каждого сотрудника создаём отдельную горутину
         go func(emp int) {
-            // employee waits for the signal that there is some work to do
-                        // all goroutines are blocked on the same channel `ch` recieve
+            // сотрудник ждёт сигнал о том, что появилась работа;
+            // все горутины блокируются на одном канале `ch` (получение).
             for p := range ch {
                 fmt.Printf("employee %d : received signal : %s\n", emp, p)
             }
 
-            // when all work is sent, manager notifies all employees by closing the channel
-            // once the channel is closed, employee breaks out of the for-range loop
+            // когда вся работа отправлена, менеджер уведомляет сотрудников,
+            // закрывая канал; как только канал закрыт, for‑range завершается
+            // и сотрудник выходит из цикла.
             fmt.Printf("employee %d : revieved shutdown signal\n", emp)
         }(e)
     }
 
-    // amount of work to be done
+    // объём работы
     const work = 10
 
     for w := 0; w < work; w++ {
-        // when work is ready, we send signal from the manager to the employee
-        // sender (manager) has a guarantee that the worker (employee) has received the signal
-        // manager doesn't care about which employee received a signal,
-        // since all employees are capable of doing the work
+        // когда работа готова, отправляем сигнал от менеджера сотрудникам;
+        // отправитель (manager) уверен, что worker (employee) получил сигнал;
+        // менеджеру не важно, какой именно сотрудник получил сигнал —
+        // все способны выполнить задачу.
         ch <- "paper"
 
         fmt.Println("manager : sent signal :", w)
     }
 
-    // when all work is sent the manages notifies all employees by closing the channel
-    // unbuffered channel provides a guarantee that all work has been sent
+    // когда вся работа отправлена, менеджер уведомляет всех закрытием канала;
+    // небуферизованный канал гарантирует, что вся работа была доставлена.
     close(ch)
     fmt.Println("manager : sent shutdown signal")
 
@@ -78,7 +78,7 @@ func main() {
 
 ```
 
-### Result (1st execution)
+### Результат (1‑й запуск)
 
 ```
 go run main.go

@@ -2,17 +2,17 @@
 
 ## [<<< ---](../gochan.md)
 
-The main idea behind **Wait For Task** pattern is to have:
+Основная идея паттерна **Wait For Task**:
 
-- a channel that provides a signaling semantics
-- a goroutine that **waits for task** so it can do some work
-- a goroutine that sends work to the previous goroutine
+- есть канал, который используется как канал сигналов;
+- есть горутина, которая **ждёт задачу**, чтобы выполнить работу;
+- есть горутина, которая отправляет работу первой.
 
-### Example
+### Пример
 
-In this example we have an `employee` (`a` goroutine) that doesn't know immediately what to do. The `employee` waits for `manager` to give him some work to do.
+В этом примере есть `employee` (горутина `a`), который изначально не знает, чем заняться. `Employee` ждёт, когда `manager` даст ему задачу.
 
-Once `manager` finds some work for the `employee`, it notifies `employee` by sending a signal (`paper`) via communication channel `ch`.
+Как только `manager` находит работу для `employee`, он уведомляет его, отправляя сигнал (`paper`) по каналу `ch`.
 
 ```go
 package main
@@ -24,25 +24,24 @@ import (
 )
 
 func main() {
-    // make channel of type string which provides signaling semantics
-    // unbuffered channel provides a guarantee that the
-    // signal being sent is received
+    // создаём канал типа string, который даёт семантику сигналов;
+    // небуферизованный канал гарантирует, что отправленный сигнал
+    // будет принят.
     ch := make(chan string)
 
-    // goroutine 'a' that waits for some work => employee
+    // горутина "a", которая ждёт работы => employee
     go func() {
-        // employee waits for signal that it has some work to do
+        // сотрудник ждёт сигнал о том, что появилась работа
         p := <-ch
         fmt.Println("employee : received signal : ", p)
     }()
 
-    // simulate the idea of unknown latency (do not use in production)
-    // e.g. manager is thinking what work to pass to the employee
+    // имитируем непредсказуемую задержку (в проде так не делаем):
+    // менеджер «думает», какую работу выдать сотруднику.
     time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
 
-    // when work is ready, send signal form manager to the employee
-    // sender (employee) has a guarantee that the worker (employee)
-    // has received a signal
+    // когда работа готова, отправляем сигнал от менеджера сотруднику;
+    // отправитель (manager) имеет гарантию, что сотрудник получил сигнал.
     ch <- "paper"
 
     fmt.Println("manager : sent signal")
@@ -51,7 +50,7 @@ func main() {
 }
 ```
 
-### Result (1st execution)
+### Результат (1‑й запуск)
 
 ```
 go run main.go

@@ -2,19 +2,21 @@
 
 ## [<<< ---](../gochan.md)
 
-This pattern aims to combine multiple `done` channels into one `agg_done`; it means that if one of a `done` channel is signaled, the whole `agg_done` channel is also closed. Yet, we do not know number of `done` channels during runtime in advanced.
+Этот паттерн предназначен для объединения нескольких каналов `done` в один общий `agg_done`. Это означает, что как только любой из каналов `done` получает сигнал (закрывается), общий канал `agg_done` тоже закрывается. При этом количество каналов `done` заранее во время выполнения может быть неизвестно.
 
-`or-channel` pattern can do so by using `goroutine` & `recursion` .
+Паттерн `or-channel` реализуется с помощью горутин и рекурсии.
 
 ```go
-// return agg_done channel
-var or func(channels ... <-chan interface{}) <- chan interface{}
+// возвращает агрегирующий канал agg_done
+var or func(channels ...<-chan interface{}) <-chan interface{}
 
 or = func(channels ...<-chan interface{}) <-chan interface{} {
-    // base cases
+    // базовые случаи
     switch len(channels) {
-        case 0: return nil
-        case 1: return channels[0]
+    case 0:
+        return nil
+    case 1:
+        return channels[0]
     }
 
     orDone := make(chan interface{})
@@ -23,27 +25,27 @@ or = func(channels ...<-chan interface{}) <-chan interface{} {
         defer close(orDone)
 
         switch len(channels) {
-            case 2:
-                select {
-                    case <- channels[0]:
-                    case <- channels[1]:
-                }
-            default:
-                select {
-                    case <- channels[0]:
-                    case <- channels[1]:
-                    case <- channels[2]:
-                    case <- or(append(channels[3:], orDone)...): // * line
-                }
+        case 2:
+            select {
+            case <-channels[0]:
+            case <-channels[1]:
+            }
+        default:
+            select {
+            case <-channels[0]:
+            case <-channels[1]:
+            case <-channels[2]:
+            case <-or(append(channels[3:], orDone)...): // * строка
+            }
 
         }
 
-    }
+    }()
     return orDone
 }
 
 ```
 
-line * makes the upper & lower recursive function depends on each other like a tree. The upper injects its own `orDone` channel into the lower. Then the lower also return its own `orDone` to the upper.
+Строка, отмеченная `*`, делает так, что верхний и нижний рекурсивные вызовы зависят друг от друга, образуя дерево: верхний передаёт свой канал `orDone` во внутренний вызов, а тот, в свою очередь, возвращает свой `orDone` наружу.
 
-If any `orDone` channel closes, the upper & lower both are notified.
+Если какой‑либо канал `orDone` закрывается, об этом уведомляются и верхние, и нижние уровни рекурсии.

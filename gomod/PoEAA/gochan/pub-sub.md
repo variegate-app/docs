@@ -2,17 +2,17 @@
 
 ## [<<< ---](../gochan.md)
 
-Publish-Subscribe is a messaging pattern used to communicate messages between different components without these components knowing anything about each other's identity.
+Publish–Subscribe — это паттерн обмена сообщениями, позволяющий передавать сообщения между компонентами, не заставляя их знать что‑либо о личности друг друга.
 
-It is similar to the Observer behavioral design pattern. The fundamental design principals of both Observer and Publish-Subscribe is the decoupling of those interested in being informed about `Event Messages` from the informer (Observers or Publishers). Meaning that you don't have to program the messages to be sent directly to specific receivers.
+Он похож на поведенческий паттерн Observer. Ключевая идея и Observer, и Publish–Subscribe — разделить отправителя событий (`Event Messages`) и всех, кто хочет о них узнавать (наблюдатели или подписчики). То есть нам не нужно жёстко прописывать, каким конкретным получателям надо отправлять сообщения.
 
-To accomplish this, an intermediary, called a "message broker" or "event bus", receives published messages, and then routes them on to subscribers.
+Для этого используется посредник — «message broker» или «event bus», который принимает опубликованные сообщения и маршрутизирует их подписчикам.
 
-There are three components **messages**, **topics**, **users**.
+Есть три сущности: **messages**, **topics**, **users**.
 
 ```go
 type Message struct {
-    // Contents
+    // содержимое сообщения
 }
 
 type Subscription struct {
@@ -37,19 +37,19 @@ type Topic struct {
 }
 
 func (t *Topic) Subscribe(uid uint64) (Subscription, error) {
-    // Get session and create one if it's the first
+    // Найти (или создать) сессию для пользователя.
 
-    // Add session to the Topic & MessageHistory
+    // Добавить сессию в Topic и в MessageHistory.
 
-    // Create a subscription
+    // Создать и вернуть Subscription.
 }
 
 func (t *Topic) Unsubscribe(Subscription) error {
-    // Implementation
+    // Логика отписки.
 }
 
 func (t *Topic) Delete() error {
-    // Implementation
+    // Логика удаления топика.
 }
 
 type User struct {

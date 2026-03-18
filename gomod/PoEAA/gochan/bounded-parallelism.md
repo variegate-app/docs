@@ -1,4 +1,4 @@
-# bounded parallelism
+# Ограниченный параллелизм
 
 ## [<<< ---](../gochan.md)
 
@@ -16,16 +16,17 @@ import (
 	"sync"
 )
 
-// walkFiles starts a goroutine to walk the directory tree at root and send the
-// path of each regular file on the string channel.  It sends the result of the
-// walk on the error channel.  If done is closed, walkFiles abandons its work.
+// walkFiles запускает горутину, которая обходит дерево каталогов root и
+// отправляет путь каждого обычного файла в строковый канал. Результат обхода
+// она отправляет в канал ошибок. Если канал done закрывается, walkFiles
+// прекращает работу.
 func walkFiles(done <-chan struct{}, root string) (<-chan string, <-chan error) {
 	paths := make(chan string)
 	errc := make(chan error, 1)
 	go func() { // HL
-		// Close the paths channel after Walk returns.
+		// Закрываем канал paths после завершения Walk.
 		defer close(paths) // HL
-		// No select needed for this send, since errc is buffered.
+		// Для этой отправки select не нужен, потому что errc буферизован.
 		errc <- filepath.Walk(root, func(path string, info os.FileInfo, err error) error { // HL
 			if err != nil {
 				return err
@@ -44,15 +45,15 @@ func walkFiles(done <-chan struct{}, root string) (<-chan string, <-chan error) 
 	return paths, errc
 }
 
-// A result is the product of reading and summing a file using MD5.
+// result — это результат чтения файла и вычисления его MD5-суммы.
 type result struct {
 	path string
 	sum  [md5.Size]byte
 	err  error
 }
 
-// digester reads path names from paths and sends digests of the corresponding
-// files on c until either paths or done is closed.
+// digester читает имена путей из канала paths и отправляет хеши соответствующих
+// файлов в канал c, пока не будут закрыты либо paths, либо done.
 func digester(done <-chan struct{}, paths <-chan string, c chan<- result) {
 	for path := range paths { // HLpaths
 		data, err := ioutil.ReadFile(path)
@@ -64,19 +65,20 @@ func digester(done <-chan struct{}, paths <-chan string, c chan<- result) {
 	}
 }
 
-// MD5All reads all the files in the file tree rooted at root and returns a map
-// from file path to the MD5 sum of the file's contents.  If the directory walk
-// fails or any read operation fails, MD5All returns an error.  In that case,
-// MD5All does not wait for inflight read operations to complete.
+// MD5All читает все файлы в дереве каталогов с корнем root и возвращает карту
+// из пути файла в MD5-сумму его содержимого. Если обход каталогов завершается
+// с ошибкой или какая‑то операция чтения завершается с ошибкой, MD5All
+// возвращает ошибку. В этом случае MD5All не дожидается завершения всех
+// уже запущенных операций чтения.
 func MD5All(root string) (map[string][md5.Size]byte, error) {
-	// MD5All closes the done channel when it returns; it may do so before
-	// receiving all the values from c and errc.
+	// MD5All закрывает канал done при выходе; это может случиться до того,
+	// как будут получены все значения из c и errc.
 	done := make(chan struct{})
 	defer close(done)
 
 	paths, errc := walkFiles(done, root)
 
-	// Start a fixed number of goroutines to read and digest files.
+	// Запускаем фиксированное количество горутин для чтения и хеширования файлов.
 	c := make(chan result) // HLc
 	var wg sync.WaitGroup
 	const numDigesters = 20
@@ -91,7 +93,7 @@ func MD5All(root string) (map[string][md5.Size]byte, error) {
 		wg.Wait()
 		close(c) // HLc
 	}()
-	// End of pipeline. OMIT
+	// Конец конвейера. OMIT
 
 	m := make(map[string][md5.Size]byte)
 	for r := range c {
@@ -100,7 +102,7 @@ func MD5All(root string) (map[string][md5.Size]byte, error) {
 		}
 		m[r.path] = r.sum
 	}
-	// Check whether the Walk failed.
+	// Проверяем, не завершился ли Walk ошибкой.
 	if err := <-errc; err != nil { // HLerrc
 		return nil, err
 	}
@@ -108,8 +110,8 @@ func MD5All(root string) (map[string][md5.Size]byte, error) {
 }
 
 func main() {
-	// Calculate the MD5 sum of all files under the specified directory,
-	// then print the results sorted by path name.
+	// Вычисляем MD5-сумму всех файлов под указанным каталогом
+	// и печатаем результаты, отсортированные по имени пути.
 	m, err := MD5All(os.Args[1])
 	if err != nil {
 		fmt.Println(err)

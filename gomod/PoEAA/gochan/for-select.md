@@ -2,20 +2,20 @@
 
 ## [<<< ---](../gochan.md)
 
-Один из базовых паттернов. Как правило используется для чтения данных из нескольких каналов
+Один из базовых паттернов. Как правило используется для чтения данных из нескольких каналов.
 
 ```go
 var c1, c2 <-chan int
 
-for { // Either loop infinitely or range over something
+for { // либо бесконечный цикл, либо range по чему‑то
     select {
-    case <-c1: // Do some work with channels
+    case <-c1: // делаем какую‑то работу с каналами
     case <-c2:
-    default: // auto run if other cases are not ready
+    default: // выполняется, если остальные ветки не готовы
     }
 
-    // do some work
+    // дополнительная работа
 }
 ```
 
-The select statement looks like switch one, but its behavior is different. All `cases` are considered simultaneously & have **equal chance** to be selected. If none of the `cases` are ready to run, the entire `select` statement blocks.
+Оператор `select` синтаксически похож на `switch`, но ведёт себя по‑другому. Все ветки `case` рассматриваются одновременно и имеют **равные шансы** быть выбраны. Если ни один из `case` не готов к выполнению, весь оператор `select` блокируется.

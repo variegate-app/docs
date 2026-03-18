@@ -1,8 +1,8 @@
-# Generator
+# Генератор
 
 ## [<<< ---](../gochan.md)
 
-## **Implementation**
+## **Реализация**
 
 ```go
 func Count(start int, end int) chan int {
@@ -10,7 +10,7 @@ func Count(start int, end int) chan int {
 
     go func(ch chan int) {
         for i := start; i <= end ; i++ {
-            // Blocks on the operation
+            // Блокируется на операции отправки
             ch <- i
         }
 
@@ -21,7 +21,7 @@ func Count(start int, end int) chan int {
 }
 ```
 
-## **Usage**
+## **Использование**
 
 ```go
 fmt.Println("No bottles of beer on the wall")

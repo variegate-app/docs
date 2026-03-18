@@ -2,13 +2,13 @@
 
 ## [<<< ---](../gochan.md)
 
-This pattern aims to split values coming from a channel into 2 others. So that we can dispatch them into two separate areas of our codebase.
+Этот паттерн предназначен для разветвления значений из одного канала в два других, чтобы можно было направлять поток данных в две разные части кодовой базы.
 
 ```go
 tee := func(
-    done <- chan interface{},
-    in <- chan interface{},
-) (<- chan interface, <- chan interface) {
+    done <-chan interface{},
+    in <-chan interface{},
+) (<-chan interface{}, <-chan interface{}) {
     out1 := make(chan interface{})
     out2 := make(chan interface{})
 
@@ -16,15 +16,18 @@ tee := func(
         defer close(out1)
         defer close(out2)
 
-        //shadow outer variable
+        // затеняем внешние переменные
         var out1, out2 = out1, out2
         for val := range orDone(done, in) {
-            for i := 0; i < 2; i ++ { //make sure 2 channels received same value
+            // гарантируем, что оба канала получат одно и то же значение
+            for i := 0; i < 2; i++ {
                 select {
-                case <- done:
-                case out1<- val:
-                    out1 = nil //stop this channel from being received
-                case out2<-val:
+                case <-done:
+                    return
+                case out1 <- val:
+                    // перестаём писать в этот канал для текущего значения
+                    out1 = nil
+                case out2 <- val:
                     out2 = nil
                 }
             }

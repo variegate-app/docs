@@ -2,7 +2,7 @@
 
 ## [<<< ---](../gochan.md)
 
-Reading values from channel of channels (`<-chan <-chan interface{}`) can be cumbersome. Hence, this pattern aims to merge all values into 1 channel, so that the consumer jobs is much easier.
+Чтение значений из «канала каналов» (`<-chan <-chan interface{}`) может быть неудобным. Этот паттерн позволяет объединить все значения в один канал, чтобы потребителю было проще с ними работать.
 
 ```go
 bridge := func(

@@ -2,35 +2,35 @@
 
 ## [<<< ---](../gochan.md)
 
-The main idea behind **Drop Pattern** is to have a limit on the amount of work that can be done at any given moment.
+Основная идея паттерна **Drop** — ограничить объём работы, который может выполняться в любой момент времени.
 
 ![./drop/image1.png](./drop/image1.png)
 
-We have:
+У нас есть:
 
-- a buffered channel that provides signaling semantic
-- a number of worker goroutines
-- a manager goroutine that:
-    - takes the work and sends it to the worker goroutine
-    - if there is more work than worker goroutines can process and buffered channel is full, manager goroutine will drop the work
+- буферизованный канал, выступающий в роли счётчика/очереди;
+- некоторое количество worker‑горутины;
+- manager‑горутина, которая:
+    - принимает работу и отправляет её worker‑горутинам;
+    - если работы больше, чем могут обработать worker‑ы, и буфер канала полон, manager **отбрасывает** (drop) новую единицу работы.
 
-### Example
+### Пример
 
-In **Drop Pattern** we have a limited amount of work (`capacity`) we can do in a day.
+В **Drop** мы имеем ограниченный объём работы (`capacity`), который можно сделать «за день».
 
-We have predefined number of `employees` that will do the work (`worker`goroutines).
+Есть заданное количество `employees`, которые выполняют работу (`worker`‑горутины).
 
-We also have a `manager` (`main` goroutine) that generates work (or gets work from some predefined list of work).
+Есть `manager` (`main`‑горутина), который генерирует задачи (или берёт их из заранее определённого списка).
 
-`Manager` notifies employee about the work via communication channel `ch`. `Employee` gets the work from the communication channel `ch`.
+`Manager` уведомляет сотрудников о работе через канал `ch`, а `Employee` забирают задачи из канала `ch`.
 
-Communication channel `ch` is capable of holding a limited amount of work "in the queue" (`buffered channel`). We say a channel has a limited `capacity`. Once channel `ch` is full, `manager` can't send new work and instead decides to **DROP** that unit of work and tries to send a new unit of work to the channel (maybe this time there is some space on the `ch`). `Manager` will do that as long as there is available work to do.
+Канал `ch` способен удерживать ограниченное количество задач в очереди (`buffered channel`). Говорят, что канал имеет ограниченную `capacity`. Как только буфер `ch` заполнен, `manager` не может отправить новую задачу и вместо этого решает **DROP** — отбросить эту единицу работы и попробовать отправить следующую (вдруг к этому моменту в `ch` освободится место). Менеджер продолжает так поступать, пока есть входящая работа.
 
 ### Use Case
 
-Good use case for this pattern would be a DNS server. A DNS server has a limited capacity, or limited amount of requests that it can process at any given moment. If there are more requests sent to the DNS server we can decide to overload and kill the server, or to **DROP** new requests until DNS server has capacity to process the request.
+Хороший пример применения — DNS‑сервер. У него есть ограниченная пропускная способность: максимум запросов, которые он может обработать одновременно. Если запросов приходит больше, мы либо «положим» сервер, перегрузив его, либо будем **отбрасывать** новые запросы до тех пор, пока у DNS‑сервера снова не появится возможность их обрабатывать.
 
-Feel free to try the example on [Go Playground](https://play.golang.com/p/vTnynyXgs_l)
+Пример можно запустить на [Go Playground](https://play.golang.org/p/vTnynyXgs_l)
 
 ```go
 package main
@@ -41,48 +41,46 @@ import (
 )
 
 func main() {
-    // capacity
-    // max number of active requests at any given moment
+    // capacity —
+    // максимальное количество активных запросов в любой момент времени
     const cap = 100
 
-    // buffered channel is used to determine when we are at capacity
+    // буферизованный канал позволяет определить момент, когда мы достигли лимита
     ch := make(chan string, cap)
 
-    // a worker goroutine
-    // e.g. an employee
+    // worker‑горутина, «сотрудник»
     go func() {
-        // for-range loop used to check for new work on communication channel `ch`
+        // for‑range по каналу `ch` — проверяем, появилась ли новая работа
         for p := range ch {
             fmt.Println("employee : received signal :", p)
         }
     }()
 
-    // amount of work to do
+    // объём работы
     const work = 200
 
-    // range over collection of work, one value at the time
+    // обходим набор единиц работы, по одной за раз
     for w := 0; w < work; w++ {
-        // select-case allow us to perform multiple channel operations
-        // at the same time, on the same goroutine
+        // select позволяет выполнять несколько операций с каналами
+        // одновременно в одной горутине
         select {
 
-        // signal/send work into channel
-        // start getting goroutines busy doing work
-        // e.g. manager sends work to employee via buffered communication channel
-        //      if buffer is full, default case is executed
+        // пытаемся отправить работу в канал:
+        // менеджер посылает задачу сотруднику через буферизованный канал;
+        // если буфер полон, срабатывает ветка default.
         case ch <- "paper":
             fmt.Println("manager : sent signal :", w)
 
-        // if channel buffer is full, drop the message
-        // allow us to detect that we are at capacity
-        // e.g. manager drops the unit of work
+        // если буфер канала заполнен — «роняем» сообщение:
+        // так мы понимаем, что достигли предела;
+        // менеджер отбрасывает единицу работы.
         default:
             fmt.Println("manager : dropper data :", w)
         }
     }
 
-    // once last piece of work is submitted, close the channel
-    // worker goroutines will process everything from the buffer
+    // после отправки последней единицы работы закрываем канал;
+    // worker‑горутины дообработают всё, что осталось в буфере.
     close(ch)
     fmt.Println("manager : sent shutdown signal")
 
@@ -91,7 +89,7 @@ func main() {
 
 ```
 
-### Result
+### Результат
 
 ```
 go run main.go

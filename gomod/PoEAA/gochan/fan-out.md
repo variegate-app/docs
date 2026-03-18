@@ -2,23 +2,23 @@
 
 ## [<<< ---](../gochan.md)
 
-Fan-Out is a messaging pattern used for distributing work amongst workers (producer: source, consumers: destination).
+Fan-Out — это паттерн обмена сообщениями для распределения работы между несколькими исполнителями (producer: источник, consumers: получатели).
 
-We can model fan-out using the Go channels.
+Такое поведение удобно моделировать с помощью каналов Go.
 
 ```go
-// Split a channel into n channels that receive messages in a round-robin fashion.
+// Разделяет канал на n каналов, которые получают сообщения по кругу (round-robin).
 func Split(ch <-chan int, n int) []<-chan int {
     cs := make([]chan int)
     for i := 0; i < n; i++ {
         cs = append(cs, make(chan int))
     }
 
-    // Distributes the work in a round robin fashion among the stated number
-    // of channels until the main channel has been closed. In that case, close
-    // all channels and return.
+    // Распределяет работу по кругу между указанным числом каналов,
+    // пока главный канал не будет закрыт. В этом случае все каналы
+    // закрываются, и функция завершает работу.
     distributeToChannels := func(ch <-chan int, cs []chan<- int) {
-        // Close every channel when the execution ends.
+        // Закрываем каждый канал по завершении обработки.
         defer func(cs []chan<- int) {
             for _, c := range cs {
                 close(c)
@@ -45,34 +45,34 @@ func Split(ch <-chan int, n int) []<-chan int {
 }
 ```
 
-The `Split` function converts a single channel into a list of channels by using a goroutine to copy received values to channels in the list in a round-robin fashion.
+Функция `Split` превращает один канал в список каналов, используя горутину, которая копирует полученные значения в список каналов по кругу (round-robin).
 
 ## Fan Out Semaphore Pattern
 
-The main idea behind **Fan Out Semaphore Pattern** is to have:
+Основная идея паттерна **Fan Out Semaphore**:
 
-- everything we had in the **Fan Out Pattern**:
-    - a buffered channel that provides a signaling semantics
-    - a goroutine that starts multiple (child) goroutines to do some work
-    - a multiple (child) goroutines that do some work and use signaling channel to signal the work is done
-- **PLUS** the addition of a:
-    - new **semaphore channel** used to restrict the number of child goroutines that can be schedule to run
+- всё, что есть в базовом **Fan Out**:
+    - буферизованный канал, дающий семантику сигналов;
+    - горутина, которая запускает несколько дочерних горутин для выполнения работы;
+    - несколько дочерних горутин, которые делают работу и с помощью канала сигнализируют о завершении;
+- **плюс** добавление:
+    - нового **semaphore channel**, который ограничивает число дочерних горутин, которые могут выполняться одновременно.
 
 ![fan-out](./fan-out/bounded-parallelism.jpeg)
 
-### Example
+### Пример
 
-In **Fan Out Pattern** we have multiple `employees` that have some work to do.
+В базовом **Fan Out** есть несколько `employees`, у которых есть работа.
 
-We also have a `manager` (`main` goroutine) that waits on that work to be done. Once each `employee` work is done, `employee` notifies `manager` by sending a signal (`paper`) via communication channel `ch`.
+Есть `manager` (`main`‑горутина), который ждёт завершения этой работы. Как только `employee` заканчивает свою часть работы, он уведомляет `manager`, отправляя сигнал (`paper`) по каналу `ch`.
 
-In **Fan Out Semaphore Pattern** we have an additional constraint in terms of maximum number of `employees` that can do work at any given moment.
+В **Fan Out Semaphore** добавляется ограничение на максимальное число `employees`, которые могут выполнять работу одновременно.
 
-### Explanation
+### Пояснение
 
-For example, we have 100 employees, but only 10 available free seats in the office space. It doesn't matter that 100 employees are available to do the work when we only have adequate space for 10 employees at any given moment. Other 90 employees have to wait until on of those 10 finish the work and frees the seat.
+Например, у нас есть 100 сотрудников, но только 10 свободных мест в офисе. Неважно, что 100 сотрудников готовы работать, если одновременно могут сидеть только 10. Оставшиеся 90 будут ждать, пока один из 10 не закончит и не освободит место.
 
-Good use case for this pattern would be batch processing, where we have some amount of work to do, but we want to limit the number of active executors at any given moment.
+Хороший кейс для этого паттерна — пакетная обработка, когда есть много работы, но мы хотим ограничить число активных исполнителей в каждый момент времени.
 
 ```go
 package main
@@ -86,47 +86,47 @@ import (
 func main() {
     emps := 10
 
-    // buffered channel, one slot for every goroutine
-    // send side can complete without receive (non-blocking)
+    // буферизованный канал, по одному слоту на каждую горутину;
+    // отправитель может завершиться, не дожидаясь приёма (не блокируется).
     ch := make(chan string, emps)
 
-    // max number of RUNNING goroutines at any given time
+    // максимальное число ИСПОЛНЯЮЩИХСЯ горутин в любой момент времени
     // g := runtime.NumCPU()
     g := 2
-    // buffered channel, based on the max number of the goroutines in RUNNING state
-    // added to CONTROL the number of goroutines in RUNNING state
+    // буферизованный канал, размер которого равен максимуму RUNNING‑горутины;
+    // используется для КОНТРОЛЯ числа одновременно выполняющихся горутин.
     sem := make(chan bool, g)
 
     for e := 0; e < emps; e++ {
-        // create 10 goroutines in the RUNNABLE state
-        // one for each employee
+        // создаём 10 горутин в состоянии RUNNABLE,
+        // по одной на каждого сотрудника.
         go func(emp int) {
 
-            // when goroutine moves from RUNNABLE to RUNNING state
-            // send signal/value inside a `sem` channel
-            // if `sem` channel buffer is full, this will block
-            // e.g. employee takes a seat
+            // когда горутина переходит из RUNNABLE в RUNNING,
+            // она отправляет значение в канал `sem`;
+            // если буфер `sem` заполнен, эта операция блокируется —
+            // сотрудник «занимает стул».
             sem <- true
             {
-                // simulate the idea of unknown latency (do not use in production)
-                // e.g. employee does some work
+                // имитируем непредсказуемую задержку (в проде так не делаем);
+                // сотрудник выполняет работу.
                 time.Sleep(time.Duration(rand.Intn(200)) * time.Millisecond)
 
-                // once work is done, signal on ch channel
+                // как только работа завершена, шлём сигнал в канал ch
                 ch <- "paper"
                 fmt.Println("employee : sent signal : ", emp)
             }
 
-            // once all work is done pull the value from the `sem` channel
-            // give place to another goroutine to do the work
-            // e.g. employee stands up and free up seat for another employee
+            // по завершении работы извлекаем значение из канала `sem`,
+            // освобождая место для другой горутины —
+            // сотрудник «встаёт и освобождает стул».
             <-sem
         }(e)
     }
 
-    // wait for all employee work to be done
+    // ждём завершения работы всех сотрудников
     for emps > 0 {
-        // receive signal sent from the employee
+        // получаем сигнал, отправленный сотрудником
         p := <-ch
 
         emps--
@@ -177,32 +177,31 @@ manager : received signal :  0
 
 ## Fan Out Bounded Pattern
 
-The main idea behind **Fan Out Bounded Pattern** is to have a limited number of goroutines that will do the work.
+Основная идея паттерна **Fan Out Bounded** — фиксированное число горутин‑работников, которые выполняют весь объём задач.
 
-We have:
+У нас есть:
 
-- a fixed number of worker goroutines
-- a manager goroutine that creates/reads the work and sends it to the worker goroutines
-- a buffered channel that provides signaling semantics
-    - used to notify worker goroutines about available work
+- фиксированное количество worker‑горутины;
+- `manager`‑горутина, которая создаёт/читает задачи и отправляет их воркерам;
+- буферизованный канал‑очередь, который используется для уведомления воркеров о доступной работе.
 
 ![fan-out](./fan-out/image2.png)
 
-### Example
+### Пример
 
-In **Fan Out Bounded Pattern** we have a **fixed** amount of `employees` that will do the work (`worker` goroutines).
+В **Fan Out Bounded** есть **фиксированное** количество `employees`, которые выполняют работу (`worker`‑горутины).
 
-We also have a `manager` (`main` goroutine) that generates work (or gets work from some predefined list of work). `Manager` notifies employee about work via communication channel `ch`. `Employee` gets the work from the communication channel `ch`.
+Есть `manager` (`main`‑горутина), который генерирует задачи (или берёт их из заданного списка). `Manager` уведомляет сотрудников о работе через канал `ch`, а `employee` забирают задачи из этого канала.
 
-Communication channel `ch` is capable of holding a limited amount of work "in the queue" (`buffered channel`). Once channel `ch` is full, `manager` can't send new work until `employee` takes work from the queue.
+Канал `ch` может хранить ограниченное количество задач в очереди (`buffered channel`). Когда `ch` заполнен, `manager` не может послать новую работу, пока кто‑то из сотрудников не заберёт задачу из очереди.
 
-Once there is no more work for employees, `manager` closes the communication channel `ch`.
+Когда задач больше нет, `manager` закрывает канал `ch`.
 
-Once all the `employees` (`worker` goroutines) complete the work, they notify the manager and they all go home.
+Когда все `employees` (`worker`‑горутины) завершают свою работу, они уведомляют менеджера и «идут домой».
 
 ### Use Case
 
-Good use case for this pattern would be batch processing, where we have some amount of work to do, but we have a limited number of executors. Each executor does the job of processing multiple units of work.
+Хороший пример для этого паттерна — пакетная обработка, где есть фиксированное число исполнителей, а каждый обрабатывает несколько единиц работы.
 
 ```go
 package main
@@ -213,59 +212,58 @@ import (
 )
 
 func main() {
-    // 5 peaces of work to do
+    // 5 единиц работы
     work := []string{"paper1", "paper2", "paper3", "paper4", "paper5"}
 
-    // number of worker goroutines that will process the work
-    // e.g. fixed number of employees
+    // количество worker‑горутины, которые будут обрабатывать задачи,
+    // т.е. фиксированное число сотрудников
     // g := runtime.NumCPU()
     g := 2
 
-    // use waitGroup to orchestrate the work
-    // e.g. each employee take one seat in the office to do the work
-    //      in this case we have two seats taken
+    // используем WaitGroup для координации работы:
+    // каждый сотрудник занимает одно место в офисе;
+    // в этом примере занято два места.
     var wg sync.WaitGroup
     wg.Add(g)
 
-    // make buffered channel of type string which provides signaling semantics
-    // e.g. manager uses this channel to notify employees about available work
-        // if buffer is full, manager can't send new work
+    // создаём буферизованный канал типа string, который даёт семантику сигналов:
+    // менеджер использует его, чтобы уведомлять сотрудников о наличии работы,
+    // а если буфер заполнен, он временно не может отправлять новые задачи.
     ch := make(chan string, g)
 
-    // create and launch worker goroutines
+    // создаём и запускаем worker‑горутины
     for e := 0; e < g; e++ {
         go func(emp int) {
-            // execute this statement (defer) when this function/goroutine terminates
-            // decrement waitGroup when there is no more work to do
-            // do this once for-range loop is over and channel is closed
-            // e.g. employee goes home
+            // defer выполнится при завершении горутины:
+            // уменьшаем счётчик WaitGroup, когда работы больше нет
+            // (фор‑рейндж закончился и канал закрыт) —
+            // сотрудник «идёт домой».
             defer wg.Done()
 
-            // for-range loop used to check for new work on communication channel `ch`
+            // цикл for‑range по каналу `ch` — сотрудник ждёт новые задачи
             for p := range ch {
                 fmt.Printf("employee %d : received signal : %s\n", emp, p)
             }
 
-            // printed when communication channel is closed
+            // печатается, когда канал `ch` закрыт
             fmt.Printf("employee %d : received shutdown signal\n", emp)
         }(e)
     }
 
-    // range over collection of work, one value at the time
+    // обходим набор задач, по одной за раз
     for _, wrk := range work {
-        // signal/send work into channel
-        // start getting goroutines busy doing work
-        // e.g. manager sends work to employee via buffered communication channel
-        //      if buffer is full, this operation blocks
+        // отправляем работу в канал, загружая goroutine:
+        // менеджер посылает задачу сотрудникам через буферизованный канал;
+        // если буфер заполнен, эта операция блокируется.
         ch <- wrk
     }
 
-    // once last piece of work is submitted, close the channel
-    // worker goroutines will process everything from the buffer
+    // когда последняя задача отправлена, закрываем канал;
+    // worker‑горутины дообработают всё, что осталось в буфере.
     close(ch)
 
-    // guarantee point, wait for all worker goroutines to finish the work
-    // e.g. manager waiits for all employees to go home before closing the office
+    // точка гарантии: ждём, пока все worker‑горутины закончат работу —
+    // менеджер ждёт, пока все сотрудники уйдут домой, прежде чем закрыть офис.
     wg.Wait()
 
 }
