@@ -1,0 +1,102 @@
+# Select Statement with Timeout
+
+## [<<< ---](../index.md)
+
+Таймаут в `select` можно реализовать с помощью функции **After()** из пакета `time`. Ниже приведена сигнатура функции **After()**.
+
+```go
+func After(d Duration) <-chan Time
+```
+
+Функция **After** ждёт указанную длительность `d`, после чего возвращает текущее время через канал.
+
+[https://golang.org/pkg/time/#Time.After](https://golang.org/pkg/time/#Time.After)
+
+# **Код**
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch1 := make(chan string)
+	go goOne(ch1)
+
+	select {
+	case msg := <-ch1:
+		fmt.Println(msg)
+	case <-time.After(time.Second * 1):
+		fmt.Println("Timeout")
+	}
+}
+
+func goOne(ch chan string) {
+	time.Sleep(time.Second * 2)
+	ch <- "From goOne goroutine"
+}
+```
+
+**Вывод**
+
+```go
+Timeout
+```
+
+В этом `select` мы ждём завершения операции чтения из **ch1**. Во второй ветке `case` используется **time.After** с длительностью 1 секунда. По сути, `select` будет ждать не менее 1 секунды завершения чтения из **ch1**, а затем (если данных так и не пришло) выполнится ветка **time.After**. В функции **goOne** мы намеренно ставим задержку больше секунды, поэтому в примере выполняется именно ветка с **time.After**, и на экран выводится `Timeout`.
+
+Таким образом, `time.After()` — это операция с каналом, которая разблокируется через заданное время.
+
+# **Timeout с бесконечным циклом снаружи select**
+
+Можно вынести бесконечный цикл `for` наружу от `select`. В этом случае оператор `select` будет выполняться бесконечное число раз. Поэтому при использовании бесконечного цикла нужно предусмотреть способ выхода из него. Один из типичных кейсов — мы ждём в течение ограниченного времени несколько сообщений по определённому каналу.
+
+Ниже пример:
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	news := make(chan string)
+	go newsFeed(news)
+
+	printAllNews(news)
+}
+
+func printAllNews(news chan string) {
+	for {
+		select {
+		case n := <-news:
+			fmt.Println(n)
+		case <-time.After(time.Second * 1):
+			fmt.Println("Timeout: News feed finished")
+			return
+		}
+	}
+}
+
+func newsFeed(ch chan string) {
+	for i := 0; i < 2; i++ {
+		time.Sleep(time.Millisecond * 400)
+		ch <- fmt.Sprintf("News: %d", i+1)
+	}
+}
+```
+
+**Вывод**
+
+```go
+News: 1
+News: 2
+Timeout: News feed finished
+```
+
+В этой программе мы создаём канал **news** для строковых данных и передаём его в функцию **newsfeed**, которая публикует новости в этот канал. В `select` мы читаем новости из канала **news**. Поскольку `select` расположен внутри бесконечного цикла `for`, он будет выполняться многократно, пока мы явно не выйдем из цикла. Одной из веток `case` является **time.After** с таймаутом 1 секунда, поэтому программа будет принимать новости из канала **news** в течение 1 секунды, после чего выполнится ветка таймаута и цикл завершится.
