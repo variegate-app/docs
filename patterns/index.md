@@ -4,23 +4,45 @@
 
 ## Patterns of Enterprise Application Architecture
 
-###### Основные
+###### Структурные
 - [Шлюз (Gateway)](./PoEAA/basic/gateway.md)
 - [Mapper](./PoEAA/basic/mapper.md)
 - [Layer Supertype](./PoEAA/basic/layer-supertype.md)
 - [Отделенный интерфейс (Separated Interface)](./PoEAA/basic/separated-interface.md)
-- [Registry (Реестр)](./PoEAA/basic/registry.md)
 - [Объект-значение (Value Object)](./PoEAA/basic/value-object.md)
-- [Частный случай (Special Case)](./PoEAA/basic/special-case.md)
-- [Дополнительный модуль (Plugin)](./PoEAA/basic/plugin.md)
 - [Фиктивная служба (Service Stub)](./PoEAA/basic/service-stub.md)
 - [Record Set](./PoEAA/basic/record-set.md)
 - [Заместитель (Proxy)](./PoEAA/basic/proxy.md)
-- [Functional Options](./PoEAA/basic/functional-options.md)
-
-###### Структурные
 - [Приспособленец (Flyweight)](./PoEAA/struct/flyweight.md)
 - [Composite](./PoEAA/struct/composite.md)
+- [Адаптер (Adapter)](./PoEAA/struct/adapter.md)
+- [Мост (Bridge)](./PoEAA/struct/bridge.md)
+- [Декоратор (Decorator)](./PoEAA/struct/decorator.md)
+- [Фасад (Facade)](./PoEAA/struct/facade.md)
+
+###### Поведенческие
+- [Частный случай (Special Case)](./PoEAA/basic/special-case.md)
+- [Дополнительный модуль (Plugin)](./PoEAA/basic/plugin.md)
+- [Цепочка обязанностей (Chain of Responsibility)](./PoEAA/behavioral/chain-of-responsibility.md)
+- [Команда (Command)](./PoEAA/behavioral/command.md)
+- [Интерпретатор (Interpreter)](./PoEAA/behavioral/interpreter.md)
+- [Итератор (Iterator)](./PoEAA/behavioral/iterator.md)
+- [Посредник (Mediator)](./PoEAA/behavioral/mediator.md)
+- [Хранитель состояний (Memento)](./PoEAA/behavioral/memento.md)
+- [Наблюдатель (Observer)](./PoEAA/behavioral/observer.md)
+- [Состояние (State)](./PoEAA/behavioral/state.md)
+- [Стратегия (Strategy)](./PoEAA/behavioral/strategy.md)
+- [Шаблонный метод (Template Method)](./PoEAA/behavioral/template-method.md)
+- [Посетитель (Visitor)](./PoEAA/behavioral/visitor.md)
+
+###### Порождающие
+- [Registry (Реестр)](./PoEAA/basic/registry.md)
+- [Functional Options](./PoEAA/basic/functional-options.md)
+- [Абстрактная фабрика (Abstract Factory)](./PoEAA/creating/abstract-factory.md)
+- [Фабричный метод (Factory Method)](./PoEAA/creating/factory-method.md)
+- [Строитель (Builder)](./PoEAA/creating/builder.md)
+- [Прототип (Prototype)](./PoEAA/creating/prototype.md)
+- [Одиночка (Singleton)](./PoEAA/creating/singleton.md)
 
 ## Golang
 
