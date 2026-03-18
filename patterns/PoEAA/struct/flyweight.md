@@ -27,3 +27,55 @@
     Если запрошенного приспособленца не оказалось в пуле, то фабрика создает его.
     
 - **Client**: использует объекты приспособленцев. Может хранить внешнее состояние и передавать его в качестве аргументов в методы приспособленцев.
+
+### Пример реализации на Go (Flyweight: символы/глифы)
+
+```go
+package main
+
+import "fmt"
+
+// Flyweight: разделяемый “внутренний” объект (intrinsic state).
+type Glyph interface {
+	Render(size int, position string)
+}
+
+// ConcreteFlyweight: хранит только то, что можно разделять (например, сам символ).
+type CharGlyph struct {
+	ch rune
+}
+
+func (g *CharGlyph) Render(size int, position string) {
+	// Внешнее состояние (extrinsic) приходит параметрами.
+	fmt.Printf("render '%c' size=%d at %s\n", g.ch, size, position)
+}
+
+// FlyweightFactory: управляет пулом и переиспользованием.
+type GlyphFactory struct {
+	pool map[rune]*CharGlyph
+}
+
+func NewGlyphFactory() *GlyphFactory {
+	return &GlyphFactory{pool: map[rune]*CharGlyph{}}
+}
+
+func (f *GlyphFactory) Get(ch rune) *CharGlyph {
+	if g, ok := f.pool[ch]; ok {
+		return g
+	}
+	g := &CharGlyph{ch: ch}
+	f.pool[ch] = g
+	return g
+}
+
+func main() {
+	f := NewGlyphFactory()
+
+	g1 := f.Get('A')
+	g2 := f.Get('A') // должно вернуться то же значение из пула
+
+	fmt.Println("same instance:", g1 == g2)
+	g1.Render(12, "10,10")
+	g2.Render(20, "30,5")
+}
+```

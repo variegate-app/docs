@@ -41,3 +41,54 @@ classDiagram
 ## Применимость
 
 Компоновщик — это относительно низкоуровневый паттерн проектирования, который лежит в основе других паттернов. Команды объединяются в составные команды, декоратор является составным объектом с одним дочерним элементом, посетитель очень часто обходит составные объекты иерархической формы.
+
+### Пример реализации на Go (Composite: меню/дерево)
+
+```go
+package main
+
+import "fmt"
+
+type Component interface {
+	Operation() string
+	Add(c Component)
+	Remove(c Component)
+	Children() []Component
+}
+
+// Leaf — лист дерева, не содержит детей.
+type Leaf struct {
+	name string
+}
+
+func (l *Leaf) Operation() string         { return "leaf:" + l.name }
+func (l *Leaf) Add(c Component)          {}
+func (l *Leaf) Remove(c Component)       {}
+func (l *Leaf) Children() []Component   { return nil }
+
+// Composite — составной узел, который хранит детей.
+type Composite struct {
+	name     string
+	children []Component
+}
+
+func (c *Composite) Operation() string {
+	out := "composite:" + c.name
+	for _, ch := range c.children {
+		out += " -> " + ch.Operation()
+	}
+	return out
+}
+
+func (c *Composite) Add(child Component)        { c.children = append(c.children, child) }
+func (c *Composite) Remove(child Component)     { /* для примера опущено */ }
+func (c *Composite) Children() []Component     { return c.children }
+
+func main() {
+	root := &Composite{name: "root"}
+	root.Add(&Leaf{name: "A"})
+	root.Add(&Leaf{name: "B"})
+
+	fmt.Println(root.Operation())
+}
+```

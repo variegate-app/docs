@@ -19,3 +19,42 @@
 > Денежные вычисления часто округляют до наименьшей из существующих мер. При этом легко не учесть копейки из-за ошибок округления.
 > 
 > Что действительно хорошо в ООП, так это то, что вы можете исправить эти проблемы, созданием класса Money (Деньги), чтобы работать с денежными величинами и избегать общих ошибок.
+
+### Пример реализации на Go (Value Object: Money)
+
+```go
+package main
+
+import "fmt"
+
+// Money — Value Object: небольшой неизменяемый объект с инвариантами.
+type Money struct {
+	amount   int64
+	currency string
+}
+
+func NewMoney(amount int64, currency string) (Money, error) {
+	// Пример инварианта: валюта не пустая.
+	if currency == "" {
+		return Money{}, fmt.Errorf("currency is empty")
+	}
+	return Money{amount: amount, currency: currency}, nil
+}
+
+func (m Money) Currency() string { return m.currency }
+
+func (m Money) Add(other Money) (Money, error) {
+	if m.currency != other.currency {
+		return Money{}, fmt.Errorf("cannot add %s and %s", m.currency, other.currency)
+	}
+	return Money{amount: m.amount + other.amount, currency: m.currency}, nil
+}
+
+func main() {
+	a, _ := NewMoney(1000, "USD")
+	b, _ := NewMoney(2500, "USD")
+
+	sum, _ := a.Add(b)
+	fmt.Printf("%d %s\n", sum.amount, sum.currency)
+}
+```

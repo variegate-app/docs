@@ -30,3 +30,47 @@
 Структуры паттернов «Заместитель» и «Декоратор» очень похожи. Каждый из них содержит ссылку на базовый компонент и делегирует ему выполнение всей работы. Но у этих паттернов разное назначение.
 
 Декоратор добавляет поведение всем методам интерфейса, позволяя нанизывать расширения одно на другое. Класс-заместитель может выполнять определенные действия, например создавать настоящий компонент по мере необходимости, но он не должен ничего "подмешивать" в результаты исполнения операции.
+
+### Пример реализации на Go (Proxy: доступ/отложенная инициализация)
+
+```go
+package main
+
+import "fmt"
+
+// Subject — общий интерфейс для Proxy и RealSubject.
+type Subject interface {
+	Fetch(id int) string
+}
+
+// RealSubject — реальный объект.
+type RealSubject struct{}
+
+func (r RealSubject) Fetch(id int) string {
+	return fmt.Sprintf("real:%d", id)
+}
+
+// Proxy — прокси: контролирует доступ и может лениво создавать RealSubject.
+type Proxy struct {
+	real    *RealSubject
+	isAdmin bool
+}
+
+func (p *Proxy) Fetch(id int) string {
+	if !p.isAdmin {
+		return "forbidden"
+	}
+	if p.real == nil {
+		p.real = &RealSubject{}
+	}
+	return p.real.Fetch(id)
+}
+
+func main() {
+	p1 := Proxy{isAdmin: false}
+	p2 := Proxy{isAdmin: true}
+
+	fmt.Println(p1.Fetch(10))
+	fmt.Println(p2.Fetch(10))
+}
+```
