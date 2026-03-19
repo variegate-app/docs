@@ -24,4 +24,4 @@ Graph (граф) описывает вершины и связи между ни
 
 ## Пример на Go
 
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/data-structures/graph/run.go
+https://github.com/variegate-app/docs/blob/c80db524031cbe3e4467da62442b3b34244aef48/examples/data-structures/graph/run.go
