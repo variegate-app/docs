@@ -1,6 +1,6 @@
 ## [<<< ---](../README.md)
 
-# Основные типы алгоритмов:
+## Основные типы алгоритмов:
 
 - **Линейные** 
     Это самый простой тип алгоритма: действия идут друг за другом, каждое начинается после того, как закончится предыдущее. Они не переставляются местами, не повторяются, выполняются при любых условиях.
@@ -13,88 +13,43 @@
 - **Вероятностные**
     Работа алгоритма зависит не только от входных данных, но и от случайных величин. К ним, например, относятся известные алгоритмы Лас-Вегас и Монте-Карло.
 
-# задачи
-
-# Сортировка
+### Сортировка
 
 | Алгоритм | Time Best| Time Middle | Time Worst | Space Worst|
 |---|---|---|---|---|
-| Quick sort |🔴 O(n log n)|🔴 O(n log n)|🔴 O(n)|🟢 O(n*log(n))|
-| Merge sort |🔴 O(n log n)|🔴 O(n log n)|🔴 O(n log n)| 🔵 O(n)|
-| Tim sort |🔵 O(n)|🔴 O(n log n)|🔴 O(n log n)|🔵 O(1)|
-| Heap sort |🔴 O(n log n)|🔴 O(n log n)|🔴 O(n log n)|🟢 O(1)|
-| Bubble sort |🔵 O(n)|🔴 O(n<sup>2</sup>)|🔴 O(n<sup>2</sup>)|🟢 O(1)|
-| Insertion Sort |🔵 O(n)|🔴 O(n<sup>2</sup>)|🔴 O(n<sup>2</sup>)|🟢 O(1)|
-| Selection Sort |🟢 O(n<sup>2</sup>)|🔴 O(n<sup>2</sup>)|🔴 O(n<sup>2</sup>)|🟢 O(1)|
-| Tree Sort |🔴 O(n log n)|🔴 O(n log(n) )|🔴 O(n<sup>2</sup>) * T|🔵 O(n)|
-| Shell Sort |🔴 O(n log n)|🔴 O(n (log n)<sup>2</sup>)|🔴 O(n (log n)<sup>2</sup>)|🟢 O(1)|
-| Bucket Sort |🟢 O(n + K)|🟢 O(n + K)|🔴 O(n<sup>2</sup>)|🔵 O(n)|
-| Radix Sort |🟢 O( nK )|🟢 O( nK )|🟢 O( nK )|🔵 O( n + K )|
-| Counting Sort  |🟢 O(n + K)|🟢 O(n + K)|🟢 O(n + K)| 🔵 O(K)|
-| Cube Sort  |🔵 O(n)|🔴 O(n log n)|🔴 O(n log n)|🔵 O(n)|
----
-<details><summary>Quick sort</summary>
+| [Quick sort](./sort/quick-sort.md) |🔴 O(n log n)|🔴 O(n log n)|🔴 O(n)|🟢 O(n*log(n))|
+| [Merge sort](./sort/merge-sort.md) |🔴 O(n log n)|🔴 O(n log n)|🔴 O(n log n)| 🔵 O(n)|
+| [Tim sort](./sort/tim-sort.md) |🔵 O(n)|🔴 O(n log n)|🔴 O(n log n)|🔵 O(1)|
+| [Heap sort](./sort/heap-sort.md) |🔴 O(n log n)|🔴 O(n log n)|🔴 O(n log n)|🟢 O(1)|
+| [Bubble sort](./sort/bubble-sort.md) |🔵 O(n)|🔴 O(n<sup>2</sup>)|🔴 O(n<sup>2</sup>)|🟢 O(1)|
+| [Insertion Sort](./sort/insertion-sort.md) |🔵 O(n)|🔴 O(n<sup>2</sup>)|🔴 O(n<sup>2</sup>)|🟢 O(1)|
+| [Selection Sort](./sort/selection-sort.md) |🟢 O(n<sup>2</sup>)|🔴 O(n<sup>2</sup>)|🔴 O(n<sup>2</sup>)|🟢 O(1)|
+| [Tree Sort](./sort/tree-sort.md) |🔴 O(n log n)|🔴 O(n log(n) )|🔴 O(n<sup>2</sup>) * T|🔵 O(n)|
+| [Shell Sort](./sort/shell-sort.md) |🔴 O(n log n)|🔴 O(n (log n)<sup>2</sup>)|🔴 O(n (log n)<sup>2</sup>)|🟢 O(1)|
+| [Bucket Sort](./sort/bucket-sort.md) |🟢 O(n + K)|🟢 O(n + K)|🔴 O(n<sup>2</sup>)|🔵 O(n)|
+| [Radix Sort](./sort/radix-sort.md) |🟢 O( nK )|🟢 O( nK )|🟢 O( nK )|🔵 O( n + K )|
+| [Counting Sort](./sort/counting-sort.md)  |🟢 O(n + K)|🟢 O(n + K)|🟢 O(n + K)| 🔵 O(K)|
+| [Cube Sort](./sort/cube-sort.md)  |🔵 O(n)|🔴 O(n log n)|🔴 O(n log n)|🔵 O(n)|
 
-![Quick](./assets/Quicksort.gif)
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/quicksort.go#L19-L38
-</details>
+### Структуры данных
 
-<details><summary>Merge sort</summary>
-
-![Merge](./assets/mergesort.gif)
-
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/mergesort.go#L18-L49
-</details>
-
-<details><summary>Tim sort</summary>
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/timsort.go#L3-L72
-</details>
-
-<details><summary>Heap sort</summary>
-
-![Heap](./assets/heapsort.gif)
-
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/heapsort.go#L3-L48
-</details>
-
-<details><summary>Bubble sort</summary>
-
-![Bubble](./assets/bubblesort.gif)
-
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/bubblesort.go#L3-L33
-</details>
-
-<details><summary>Insertion Sort</summary>
-
-![Insert](./assets/insertionsort.gif) 
-
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/insertionsort.go#L3-L28
-</details>
-
-<details><summary>Selection Sort</summary>
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/selectionsort.go#L3-L29
-</details>
-
-<details><summary>Tree Sort</summary>
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/treesort.go#L3-L54
-</details>
-
-<details><summary>Shell Sort</summary>
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/shellsort.go#L3-L44
-</details>
-
-<details><summary>Bucket Sort</summary>
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/bucketsort.go#L3-L80
-</details>
-
-<details><summary>Radix Sort</summary>
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/radixsort.go#L3-L74
-</details>
-
-<details><summary>Counting Sort</summary>
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/countingsort.go#L3-L59
-</details>
-
-<details><summary>Cube Sort</summary>
-https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/cubesort.go#L3-L46
-</details>
+| Структура данных | Access | Search | Insertion | Deletion | Space complexity |
+|---|---|---|---|---|---|
+| [Array](./data-structures/array.md) | 🟢 O(1) | 🔴 O(n) | 🔴 O(n) | 🔴 O(n) | 🔵 O(n) |
+| [Queue](./data-structures/queue.md) | 🟢 O(1) | 🔴 O(n) | 🟢 O(1) | 🟢 O(1) | 🔵 O(n) |
+| [Hash Table](./data-structures/hash-table.md) | N/A | 🟢 O(1)\* | 🟢 O(1)\* | 🟢 O(1)\* | 🔵 O(n) |
+| [Graph](./data-structures/graph.md) | N/A | 🔴 O(V) | 🟢 O(1) | 🔴 O(V + E) | 🔵 O(V + E) |
+| [Stack](./data-structures/stack.md) | 🟢 O(1) | 🔴 O(n) | 🟢 O(1) | 🟢 O(1) | 🔵 O(n) |
+| [Heap](./data-structures/heap.md) | 🔵 O(1) | 🔴 O(n) | 🔴 O(log n) | 🔴 O(log n) | 🔵 O(n) |
+| [Singly Linked List](./data-structures/singly-linked-list.md) | 🔴 O(n) | 🔴 O(n) | 🟢 O(1) | 🟢 O(1) | 🔵 O(n) |
+| [Doubly Linked List](./data-structures/doubly-linked-list.md) | 🔴 O(n) | 🔴 O(n) | 🟢 O(1) | 🟢 O(1) | 🔵 O(n) |
+| [Skip List](./data-structures/skip-list.md) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(n*log(n))|
+| [Tree](./data-structures/tree.md) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔵 O(n) |
+| [Cartesian Tree](./data-structures/cartesian-tree.md) | 🔴 O(n) | 🔴 O(n) | 🔴 O(n) | 🔴 O(n) | 🔵 O(n) |
+| [B-Tree](./data-structures/b-tree.md) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔵 O(n) |
+| [Binary Tree](./data-structures/binary-tree.md) | 🔴 O(n) | 🔴 O(n) | 🔴 O(n) | 🔴 O(n) | 🔵 O(n) |
+| [Binary Search Tree](./data-structures/binary-search-tree.md) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔵 O(n) |
+| [Red-Black Tree](./data-structures/red-black-tree.md) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔵 O(n) |
+| [Splay Tree](./data-structures/splay-tree.md) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔵 O(n) |
+| [AVL Tree](./data-structures/avl-tree.md) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔵 O(n) |
+| [KD Tree](./data-structures/kd-tree.md) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔴 O(log n) | 🔵 O(n) |

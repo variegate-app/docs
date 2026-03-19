@@ -1,0 +1,7 @@
+# Merge sort
+
+## [<<< ---](../index.md)
+
+![Merge](../assets/Mergesort.gif)
+
+https://github.com/variegate-app/docs/blob/42dd478219c2cde4138bef6c905f56010d0c5860/examples/sort/mergesort.go#L18-L49
