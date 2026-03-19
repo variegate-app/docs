@@ -68,3 +68,23 @@ type Session struct {
 Events can be published in a parallel fashion by utilizing stackless goroutines.
 
 Performance can be improved by dealing with straggler subscribers by using a buffered inbox and you stop sending events once the inbox is full.
+
+## Типовые ошибки / антипаттерны
+- Доставлять события синхронно всем подписчикам без буферов: медленный подписчик “прибивает” весь delivery.
+- Отсутствие стратегии `unsubscribe`/cleanup: подписчики копятся, утечки памяти/каналов.
+- Не определять поведение при переполнении inbox (drop vs block vs retry).
+
+## Практический чеклист
+- Сущности разделены: `Topic`/`Broker` управляет списком подписчиков и жизненным циклом.
+- Доставка событий учитывает backpressure (буфер inbox, drop политика, ограничение скорости).
+- Подписчики получают события через канал, и их горутины корректно завершаются при shutdown.
+- Есть идемпотентность/поведение на дубликаты сообщений (если delivery может повторяться).
+
+## Как адаптировать под кейс
+- Для “важно не потерять” выбирайте очередь/retention + подтверждения; для “важно не блокировать” применяйте drop при переполнении.
+- Настройте размер buffered inbox под измеренную латентность подписчиков.
+
+## Связанные паттерны
+- `./context.md`
+- `./graceful-shutdown.md`
+- `../PoEAA/behavioral/observer.md`

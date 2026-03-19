@@ -36,8 +36,9 @@
 <details><summary>Quick sort</summary>
 
 ![Quick](./assets/Quicksort.gif)
+```golang:sort/quicksort.go [3-38]
 
-./sort/quicksort.go#L3-L38
+```
 </details>
 
 <details><summary>Merge sort</summary>

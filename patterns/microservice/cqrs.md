@@ -28,3 +28,51 @@ CQRS расшифровывается как Command Query Responsibility Segreg
 - **Сложность.** Основная идея CQRS звучит просто. Но ее реализация может привести к усложнению проекта приложения, особенно если реализовывать его в связке с Event Sourcing.
 - **Обмен сообщениями**. Сама по себе модель CQRS не требует месседжинга, но месседж брокеры часто применяются для обработки команд и публикации событий. Это означает, нужно будет реализовывать обработку сбоев и дубликатов при передаче сообщений.
 - **Eventual consistency**. Если вы разделите базы данных для чтения и записи, в базе данных для чтения могут оставаться устаревшие данные. БД для чтения должна быть up to date, чтобы отражать изменения из БД для записи, и может быть трудно трекать, когда пользователь сделал запрос на основе устаревших данных с БД для чтения.
+
+## Контракты (что именно “ходит” между сервисами/слоями)
+- `Command` (запись): инкапсулирует намерение изменить состояние агрегата.
+  - обязательные поля: `Saga/CorrelationID` (для трассировки), `IdempotencyKey` (чтобы безопасно повторять), `AggregateID` (на что влияет).
+- `Query` (чтение): формулирует запрос на чтение модели представления (read model).
+  - обязательные поля: `CorrelationID` и параметры фильтрации (без side effects).
+- `Event` (переходы/факты): публикуется после успешного применения Command к write model и используется для обновления read model (проекция) и/или для саг.
+  - обязательные поля: `EventID` (идемпотентность), `CorrelationID`, `AggregateID`, `Version` (оптимистичная конкуренция).
+
+## Минимальная реализация (скелет)
+Ниже — “каркас” слоёв, который обычно нужен даже при отсутствии отдельного event sourcing.
+
+```go
+type Command interface {
+	AggregateID() string
+	IdempotencyKey() string
+	CorrelationID() string
+}
+
+type Query interface {
+	CorrelationID() string
+}
+
+type Event interface {
+	EventID() string
+	AggregateID() string
+	Version() int
+	CorrelationID() string
+}
+
+type CommandBus interface {
+	Dispatch(ctx context.Context, cmd Command) error
+}
+
+type QueryBus interface {
+	Ask[R any](ctx context.Context, q Query) (R, error)
+}
+
+// Проектор обновляет read model, читая Events.
+type Projector interface {
+	Apply(ctx context.Context, event Event) error
+}
+```
+
+Практический поток:
+- клиент отправляет `Command` в `CommandBus`;
+- handler применяет команду к write model и публикует `Event` (в идеале — в рамках единой транзакции, как вы описали выше);
+- read model обновляется `Projector`'ом (по event stream или из outbox).

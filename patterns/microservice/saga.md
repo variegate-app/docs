@@ -76,3 +76,71 @@
 - Порядок шагов в компенсирующей транзакции не обязательно должен быть зеркальным отражением шагов в исходной операции. Например, одно хранилище данных может быть более чувствительным к несоответствиям, чем другое, и поэтому сначала необходимо выполнить шаги в компенсирующей транзакции, которая отменяет изменения в этом хранилище.
 - Установка кратковременной блокировки на основе тайм-аута для каждого ресурса, необходимого для завершения операции, и заблаговременное получение этих ресурсов может помочь повысить вероятность успешного завершения всей операции. Работу следует выполнять только после того, как все ресурсы получены. Все действия должны быть завершены до истечения срока действия блокировки.
 - Подумайте об использовании логики повторения, которая более простительна, чем обычно, чтобы минимизировать сбои, которые инициируют компенсирующую транзакцию. Если шаг в операции, которая реализует возможную согласованность, завершается неудачей, попробуйте обработать ошибку как временное исключение и повторите шаг. Прервите операцию и начните компенсирующую транзакцию только в том случае, если шаг не удался повторно или безвозвратно.
+
+## Контракты (events/commands для саги)
+Для саги полезно явно договориться о сущностях, которые циркулируют между шагами:
+- `SagaID` (идентификатор бизнес-операции) и `CorrelationID` (трассировка всех шагов).
+- `StepID` (идентификатор шага), чтобы делать replay идемпотентным.
+- `Event` от шагов:
+  - примеры: `HotelReserved`, `HotelReservationFailed`, `CarBooked`, `CarBookingFailed`.
+  - обязательные поля: `EventID` (идемпотентность), `SagaID`, `StepID`, `CorrelationID`, `Timestamp`.
+- `Command` на шаги и компенсации:
+  - примеры: `ReserveHotel`, `CancelHotelReservation`, `BookCar`, `CancelCarBooking`.
+  - обязательные поля: `SagaID`, `StepID`, `IdempotencyKey` (обычно = `SagaID + StepID + ActionType`), `CorrelationID`.
+
+## Минимальная реализация (скелет оркестратора)
+Ниже пример “минимального” оркестратора/стейт-машины: он хранит состояние саги, принимает события шагов и решает, какой шаг/компенсация дальше.
+
+```go
+type SagaState struct {
+	SagaID     string
+	Status     string // Active | Completed | Compensating | Failed
+	StepsDone  map[string]bool
+	StepsError map[string]string
+	Version    int // для оптимистичной конкуренции state store
+}
+
+type Event interface {
+	SagaID() string
+	StepID() string
+	EventID() string
+	CorrelationID() string
+}
+
+type Command interface {
+	SagaID() string
+	StepID() string
+	IdempotencyKey() string
+	CorrelationID() string
+}
+
+type SagaOrchestrator interface {
+	Handle(ctx context.Context, e Event) error
+}
+
+type BookingSaga struct {
+	stateStore SagaStateStore
+	commandBus CommandBus
+}
+
+func (s *BookingSaga) Handle(ctx context.Context, e Event) error {
+	// 1) загрузить SagaState
+	st := s.stateStore.Get(ctx, e.SagaID())
+
+	// 2) идемпотентно обработать Event (по EventID)
+
+	// 3) обновить st.StepsDone / st.StepsError
+
+	// 4) решить: следующий шаг или компенсации
+	//    - если Success: Dispatch(next Command)
+	//    - если Failure: Dispatch(Compensating Commands) для StepsDone в нужном порядке
+
+	// 5) сохранить обновлённое состояние
+	return s.stateStore.Save(ctx, st)
+}
+```
+
+Ключевые требования для корректной реализации:
+- `SagaState` персистится (иначе при повторной доставке событий сагу невозможно продолжить).
+- И события, и команды (особенно компенсации) идемпотентны.
+- Компенсации запускаются только для тех шагов, которые действительно “успешно были применены”.

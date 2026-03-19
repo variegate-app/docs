@@ -1,10 +1,9 @@
-
-
 # [<<< ---](../README.md)
 
 ## Patterns of Enterprise Application Architecture
 
 ###### Структурные
+
 - [Шлюз (Gateway)](./PoEAA/basic/gateway.md)
 - [Mapper](./PoEAA/basic/mapper.md)
 - [Layer Supertype](./PoEAA/basic/layer-supertype.md)
@@ -21,6 +20,7 @@
 - [Фасад (Facade)](./PoEAA/struct/facade.md)
 
 ###### Поведенческие
+
 - [Частный случай (Special Case)](./PoEAA/basic/special-case.md)
 - [Дополнительный модуль (Plugin)](./PoEAA/basic/plugin.md)
 - [Цепочка обязанностей (Chain of Responsibility)](./PoEAA/behavioral/chain-of-responsibility.md)
@@ -36,6 +36,7 @@
 - [Посетитель (Visitor)](./PoEAA/behavioral/visitor.md)
 
 ###### Порождающие
+
 - [Registry (Реестр)](./PoEAA/basic/registry.md)
 - [Functional Options](./PoEAA/basic/functional-options.md)
 - [Абстрактная фабрика (Abstract Factory)](./PoEAA/creating/abstract-factory.md)
@@ -113,7 +114,7 @@
 ## Источники данных
 
 - [Row Data Gateway (Шлюз к данным записи)](./sourcedata/rowdatagateway.md)
-- [Active Record (Активная запись) ](./sourcedata/activerecord.md)
+- [Active Record (Активная запись)](./sourcedata/activerecord.md) 
 - [Table Data Gateway (Шлюз к данным таблицы)](./sourcedata/tabledatagateway.md)
 - [Data Mapper](./sourcedata/datamapper.md)
 
