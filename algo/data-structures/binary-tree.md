@@ -24,4 +24,4 @@ Binary Tree - дерево, в котором у каждого узла не б
 
 ## Пример на Go
 
-https://github.com/variegate-app/docs/blob/c80db524031cbe3e4467da62442b3b34244aef48/examples/data-structures/binary-tree/run.go
+https://github.com/variegate-app/docs/blob/c80db524031cbe3e4467da62442b3b34244aef48/examples/data-structures/binary-tree/run.go#L1-L126

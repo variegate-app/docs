@@ -24,4 +24,4 @@ B-Tree - сбалансированное многопутевое дерево 
 
 ## Пример на Go
 
-https://github.com/variegate-app/docs/blob/c80db524031cbe3e4467da62442b3b34244aef48/examples/data-structures/b-tree/run.go
+https://github.com/variegate-app/docs/blob/c80db524031cbe3e4467da62442b3b34244aef48/examples/data-structures/b-tree/run.go#L1-L62
