@@ -36,7 +36,7 @@
 <details><summary>Quick sort</summary>
 
 ![Quick](./assets/Quicksort.gif)
-\`\`\`golang:sort/quicksort.go[3-38]\`\`\`
+```golang:sort/quicksort.go```
 </details>
 
 <details><summary>Merge sort</summary>
