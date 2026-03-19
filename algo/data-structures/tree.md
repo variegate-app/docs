@@ -24,4 +24,4 @@ Tree (дерево) - иерархическая структура данных
 
 ## Пример на Go
 
-https://github.com/variegate-app/docs/blob/c80db524031cbe3e4467da62442b3b34244aef48/examples/data-structures/tree/run.go#L1-L98
+https://github.com/variegate-app/docs/blob/c80db524031cbe3e4467da62442b3b34244aef48/examples/data-structures/tree/run.go#L1-L97
